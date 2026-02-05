@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ../video-conferencing-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres:5432/meetdb
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ../video-conferencing-backend:/app
+
+  frontend:
+    build: ../video-conferencing-frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=meetdb
+    ports:
+      - "5432:5432"
